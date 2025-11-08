@@ -161,15 +161,18 @@ target_compile_definitions(placo PUBLIC -DBOOST_DISABLE_PRAGMA_MESSAGE)
 target_link_libraries(placo ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} libplaco eigenpy::eigenpy)
 target_include_directories(placo PRIVATE ${PYTHON_INCLUDE_DIRS})
 
-add_custom_command(
-    TARGET placo POST_BUILD
-    COMMAND doxystub
-        --module placo
-        --doxygen_directory "${CMAKE_CURRENT_SOURCE_DIR}"
-        --output "${CMAKE_BINARY_DIR}/${PYTHON_SITELIB}/placo.pyi"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/${PYTHON_SITELIB}"
-    COMMENT "Generating stubs..."
-)
+if(NOT DEFINED PLACO_PY_TO_INSTALL)
+  add_custom_command(
+      TARGET placo POST_BUILD
+      COMMAND doxystub
+          --module placo
+          --doxygen_directory "${CMAKE_CURRENT_SOURCE_DIR}"
+          --output "${CMAKE_BINARY_DIR}/${PYTHON_SITELIB}/placo.pyi"
+      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/${PYTHON_SITELIB}"
+      COMMENT "Generating stubs..."
+  )
+  set(PLACO_PY_TO_INSTALL "${CMAKE_BINARY_DIR}/${PYTHON_SITELIB}/placo.pyi")
+endif()
 
 ADD_CUSTOM_TARGET(placo_utils_files ALL
                   COMMAND ${CMAKE_COMMAND} -E copy_directory
@@ -187,5 +190,5 @@ endif()
 
 install(TARGETS libplaco DESTINATION lib)
 install(TARGETS placo DESTINATION ${PYTHON_SITELIB})
-install(FILES ${CMAKE_BINARY_DIR}/${PYTHON_SITELIB}/placo.pyi DESTINATION ${PYTHON_SITELIB})
+install(FILES ${PLACO_PY_TO_INSTALL} DESTINATION ${PYTHON_SITELIB})
 install(DIRECTORY ${CMAKE_BINARY_DIR}/${PYTHON_SITELIB}/placo_utils DESTINATION ${PYTHON_SITELIB})
