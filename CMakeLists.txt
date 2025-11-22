@@ -157,6 +157,9 @@ add_library(placo MODULE
 )
 set_target_properties(placo PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${PYTHON_SITELIB})
 target_compile_definitions(placo PUBLIC -DBOOST_DISABLE_PRAGMA_MESSAGE)
+if(WIN32)
+set_target_properties(placo PROPERTIES SUFFIX ".pyd")
+endif()
 
 target_link_libraries(placo ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} libplaco eigenpy::eigenpy)
 target_include_directories(placo PRIVATE ${PYTHON_INCLUDE_DIRS})
